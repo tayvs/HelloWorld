@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ScalaCompilerConfiguration">
+    <profile name="sbt 1" modules="helloworld,statistic,helloworld-impl,statistic-api,helloworld-stream-impl,helloworld-api,statistic-impl,helloworld-stream-api" />
+  </component>
+</project>
