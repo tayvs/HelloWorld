@@ -1,20 +1,14 @@
 package com.example.statistic.api
 
-import akka.NotUsed
-import akka.stream.scaladsl.Source
-import com.lightbend.lagom.scaladsl.api.broker.Topic
-import com.lightbend.lagom.scaladsl.api.broker.kafka.{KafkaProperties, PartitionKeyStrategy}
+import akka.{Done, NotUsed}
 import com.lightbend.lagom.scaladsl.api.{Descriptor, Service, ServiceCall}
-
-import CampaignStatisticService._
+import play.api.libs.json.{Format, Json}
 
 trait CampaignStatisticService extends Service {
   
   def getCampaign(campaignId: String): ServiceCall[NotUsed, Campaign]
   
-  def processStatistic(acctStatistic: NotUsed): ServiceCall[Source[NotUsed, NotUsed], Source[NotUsed, NotUsed]]
-  
-  def acctStatisticTopic: Topic[NotUsed]
+  def processStatistic: ServiceCall[(String, LocalDeliveryStatus), Done]
   
   override final def descriptor: Descriptor = {
     import Service._
@@ -23,15 +17,18 @@ trait CampaignStatisticService extends Service {
       .withCalls(
         restCall(Method.GET, "/campaign/statistic/:id", getCampaign _)
       )
-      .withTopics(
-        topic("campaign", acctStatisticTopic)
-      )
       .withAutoAcl(true)
   }
   
 }
-object CampaignStatisticService {
-  
-  case class Campaign(campaignId: String)
-  
+
+case class Campaign(
+  campaignId: String,
+  delivered: Int,
+  notDelivered: Int,
+  ban: Int,
+  bounce: Int
+)
+object Campaign {
+  implicit val format: Format[Campaign] = Json.format
 }

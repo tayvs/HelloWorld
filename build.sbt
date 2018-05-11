@@ -51,9 +51,17 @@ lazy val `helloworld-stream-impl` = (project in file("helloworld-stream-impl"))
 
 
 lazy val `statistic` = (project in file("."))
-  .aggregate(`statistic-api`, `statistic-impl`)
+  .aggregate(`statistic-api`, `statistic-impl`, `acct-kafka-topic`)
 
 lazy val `statistic-api` = (project in file("statistic-api"))
+  .settings(
+    libraryDependencies ++= Seq(
+      lagomScaladslApi
+    )
+  )
+  .dependsOn(`acct-kafka-topic`)
+
+lazy val `acct-kafka-topic` = (project in file("acct-kafka-topic"))
   .settings(
     libraryDependencies ++= Seq(
       lagomScaladslApi
@@ -72,4 +80,4 @@ lazy val `statistic-impl` = (project in file("statistic-impl"))
     )
   )
   .settings(lagomForkedTestSettings: _*)
-  .dependsOn(`statistic-api`)
+  .dependsOn(`statistic-api`, `acct-kafka-topic`)
