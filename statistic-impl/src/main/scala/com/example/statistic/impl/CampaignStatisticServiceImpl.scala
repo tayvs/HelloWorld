@@ -2,17 +2,19 @@ package com.example.statistic.impl
 
 import akka.stream.scaladsl.Flow
 import akka.{Done, NotUsed}
-import com.example.statistic.api.{Campaign, CampaignStatisticService, LocalDeliveryStatus}
-import com.example.statistic.api.LocalDeliveryStatus._
+import com.example.statistic.api.{Campaign, CampaignStatisticService}
+import com.example.statistic.impl.CampaignStatisticCommand.GetCampaign
 import com.example.statistic.topic.{KafkaTopic, LocalDeliveryStatus}
+import com.example.statistic.topic.LocalDeliveryStatus._
 import com.lightbend.lagom.scaladsl.api.ServiceCall
 import com.lightbend.lagom.scaladsl.persistence.PersistentEntityRegistry
-import scala.concurrent.Future
+
+import scala.concurrent.{ExecutionContext, Future}
 
 class CampaignStatisticServiceImpl(
   persistentEntityRegistry: PersistentEntityRegistry,
   statisticTopic: KafkaTopic
-) extends CampaignStatisticService {
+)(implicit ec: ExecutionContext) extends CampaignStatisticService {
   
   statisticTopic
     .acctStatisticTopic
@@ -31,10 +33,10 @@ class CampaignStatisticServiceImpl(
     case (campaignId, status) =>
       Some(status)
         .collect {
-          case SuccessDelivery => CampaignStatisticEvent.Delivered
-          case NotDelivery => CampaignStatisticEvent.NotDelivered
-          case BouncedMail => CampaignStatisticEvent.Bounced
-          case BannedDelivery => CampaignStatisticEvent.Banned
+          case SuccessDelivery => CampaignStatisticCommand.MailDelivered
+          case NotDelivery => CampaignStatisticCommand.MailNotDelivered
+          case BouncedMail => CampaignStatisticCommand.MailBounced
+          case BannedDelivery => CampaignStatisticCommand.MailBanned
         }
         .map { status =>
           persistentEntityRegistry

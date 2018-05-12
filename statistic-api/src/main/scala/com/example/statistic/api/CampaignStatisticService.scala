@@ -1,6 +1,7 @@
 package com.example.statistic.api
 
 import akka.{Done, NotUsed}
+import com.example.statistic.topic.LocalDeliveryStatus
 import com.lightbend.lagom.scaladsl.api.{Descriptor, Service, ServiceCall}
 import play.api.libs.json.{Format, Json}
 
