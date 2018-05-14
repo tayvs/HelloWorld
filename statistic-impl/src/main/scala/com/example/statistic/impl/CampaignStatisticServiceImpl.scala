@@ -4,6 +4,7 @@ import akka.stream.scaladsl.Flow
 import akka.{Done, NotUsed}
 import com.example.statistic.api.{Campaign, CampaignStatisticService}
 import com.example.statistic.impl.CampaignStatisticCommand.GetCampaign
+import com.example.statistic.impl.CampaignStatisticState.CampaignStatistic
 import com.example.statistic.topic.{KafkaTopic, LocalDeliveryStatus}
 import com.example.statistic.topic.LocalDeliveryStatus._
 import com.lightbend.lagom.scaladsl.api.ServiceCall
@@ -25,7 +26,8 @@ class CampaignStatisticServiceImpl(
     ServiceCall { _ =>
       persistentEntityRegistry
         .refFor[CampaignStatisticEntity](campaignId)
-        .ask(GetCampaign)
+        .ask(GetCampaign(campaignId))
+        .mapTo[CampaignStatistic]
         .map(el => Campaign(campaignId, el.delivered, el.notDelivered, el.ban, el.bounce))
     }
   
