@@ -40,7 +40,7 @@ object KafkaTopic {
     }
 
     val campaignId =
-      if (csvData(19).indexOf('_') == 8) csvData(19).take(6)
+      if (csvData(19).indexOf('_') == 8) csvData(19).take(8)
       else ""
     
     (campaignId, localDeliveryStatus)
