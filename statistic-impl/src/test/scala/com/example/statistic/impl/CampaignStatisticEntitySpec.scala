@@ -39,7 +39,7 @@ class CampaignStatisticEntitySpec extends WordSpec with Matchers with BeforeAndA
       outcomes2.replies should contain only StateNotInit
     }
     
-    "statistic must persist StatusChanged event with status" in withTestDriver{ driver =>
+    "statistic must persist StatusChanged event with status" in withTestDriver { driver =>
       val outcomesChangeStatus = driver.run(CampaignStart)
       outcomesChangeStatus.events should contain only StatusChanged(CampaignStart.status)
       outcomesChangeStatus.replies should contain only Done

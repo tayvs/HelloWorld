@@ -19,7 +19,7 @@ trait KafkaTopic extends Service {
     import Service._
     named("acct-statistic-topic")
       .withTopics(
-        topic("campaign", acctStatisticTopic)(KafkaTopic.msgSer)
+        topic("testCampaign", acctStatisticTopic)(KafkaTopic.msgSer)
       )
       .withAutoAcl(true)
   }
@@ -29,11 +29,9 @@ trait KafkaTopic extends Service {
 object KafkaTopic {
 
   val jsonDeser: NegotiatedDeserializer[(String, LocalDeliveryStatus), ByteString] = (wire: ByteString) => {
-    val csvLine = Json
-      .parse(wire.iterator.asInputStream)
-      .as[List[String]].mkString(",")
+    val csvData = Json.parse(wire.iterator.asInputStream).as[List[String]]
 
-    val localDeliveryStatus = csvLine match {
+    val localDeliveryStatus = csvData.mkString(",") match {
       case Delivered() => LocalDeliveryStatus.SuccessDelivery
       case Bounced() => LocalDeliveryStatus.BouncedMail
       case Banned() => LocalDeliveryStatus.BannedDelivery
@@ -41,7 +39,10 @@ object KafkaTopic {
       case _ => LocalDeliveryStatus.NotFound
     }
 
-    val campaignId = "1111"
+    val campaignId =
+      if (csvData(19).indexOf('_') == 8) csvData(19).take(6)
+      else ""
+    
     (campaignId, localDeliveryStatus)
   }
 

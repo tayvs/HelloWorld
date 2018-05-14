@@ -6,7 +6,7 @@ sealed trait CampaignStatisticState
 
 object CampaignStatisticState {
   
-  case object StateNotInit extends CampaignStatisticState {
+  case object StateNotInit extends Exception("Campaign not found") with CampaignStatisticState {
     
     implicit val format: Format[StateNotInit.type] = new Format[StateNotInit.type] {
       override def reads(json: JsValue): JsResult[StateNotInit.type] = {
