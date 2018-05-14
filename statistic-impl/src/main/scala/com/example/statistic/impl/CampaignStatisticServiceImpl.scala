@@ -20,7 +20,9 @@ class CampaignStatisticServiceImpl(
   statisticTopic
     .acctStatisticTopic
     .subscribe
-    .atLeastOnce(Flow[(String, LocalDeliveryStatus)].mapAsync(8)(processStatistic.invoke(_)))
+    .atLeastOnce(
+      Flow[(String, LocalDeliveryStatus)].mapAsync(8)(processStatistic.invoke(_))
+    )
   
   override def getCampaign(campaignId: String): ServiceCall[NotUsed, Campaign] =
     ServiceCall { _ =>
@@ -35,10 +37,10 @@ class CampaignStatisticServiceImpl(
     case (campaignId, status) =>
       Some(status)
         .collect {
-          case SuccessDelivery => CampaignStatisticCommand.MailDelivered
-          case NotDelivery => CampaignStatisticCommand.MailNotDelivered
-          case BouncedMail => CampaignStatisticCommand.MailBounced
-          case BannedDelivery => CampaignStatisticCommand.MailBanned
+          case SuccessDelivery => CampaignStatisticCommand.MailsStatus(1)
+          case NotDelivery => CampaignStatisticCommand.MailsStatus(0, 1)
+          case BouncedMail => CampaignStatisticCommand.MailsStatus(0, 0, 1)
+          case BannedDelivery => CampaignStatisticCommand.MailsStatus(0, 0, 0, 1)
         }
         .map { status =>
           persistentEntityRegistry
