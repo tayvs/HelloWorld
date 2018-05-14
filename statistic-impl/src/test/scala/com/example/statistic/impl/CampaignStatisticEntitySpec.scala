@@ -34,8 +34,8 @@ class CampaignStatisticEntitySpec extends WordSpec with Matchers with BeforeAndA
     }
 
     "statistic must be with entityId and one delivery mail" in withTestDriver { driver =>
-      val outcomes1 = driver.run(CampaignStatisticCommand.MailDelivered)
-      outcomes1.events should contain only CampaignStatisticEvent.Delivered
+      val outcomes1 = driver.run(CampaignStatisticCommand.MailsStatus(1))
+      outcomes1.events should contain only CampaignStatisticEvent.Delivered()
       outcomes1.replies should contain only Done
       val outcomes2 = driver.run(GetCampaign(entityId))
       outcomes2.replies should contain only CampaignStatistic(1, 0, 0, 0, "NotStarted")

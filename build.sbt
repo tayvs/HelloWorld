@@ -78,8 +78,7 @@ lazy val `statistic-impl` = (project in file("statistic-impl"))
       lagomScaladslKafkaBroker,
       lagomScaladslTestKit,
       macwire,
-      scalaTest,
-      "io.spray" %% "spray-json" % "1.3.3"
+      scalaTest
     )
   )
   .settings(lagomForkedTestSettings: _*)
