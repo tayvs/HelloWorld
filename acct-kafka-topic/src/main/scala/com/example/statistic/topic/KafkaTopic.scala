@@ -13,7 +13,7 @@ import scala.collection.immutable
 
 trait KafkaTopic extends Service {
 
-  def acctStatisticTopic: Topic[(String, LocalDeliveryStatus)]
+  def acctStatisticTopic: Topic[LocalDeliveryStatus]
 
   override final def descriptor: Descriptor = {
     import Service._
@@ -28,38 +28,28 @@ trait KafkaTopic extends Service {
 
 object KafkaTopic {
 
-  val jsonDeser: NegotiatedDeserializer[(String, LocalDeliveryStatus), ByteString] = (wire: ByteString) => {
+  val jsonDeser: NegotiatedDeserializer[LocalDeliveryStatus, ByteString] = (wire: ByteString) => {
     val csvData = Json.parse(wire.iterator.asInputStream).as[List[String]]
 
-    val localDeliveryStatus = csvData.mkString(",") match {
-      case Delivered() => LocalDeliveryStatus.SuccessDelivery
-      case Bounced() => LocalDeliveryStatus.BouncedMail
-      case Banned() => LocalDeliveryStatus.BannedDelivery
-      case NotDelivery() => LocalDeliveryStatus.NotDelivery
+    csvData.mkString(",") match {
+      case Delivered() => LocalDeliveryStatus.SuccessDelivery(JobId(csvData(19)))
+      case Bounced() => LocalDeliveryStatus.BouncedMail(JobId(csvData(19)))
+      case Banned() => LocalDeliveryStatus.BannedDelivery(JobId(csvData(19)))
+      case NotDelivery() => LocalDeliveryStatus.NotDelivery(JobId(csvData(19)))
       case _ => LocalDeliveryStatus.NotFound
     }
-
-    val campaignId =
-      if (csvData(19).indexOf('_') == 8) csvData(19).take(8)
-      else ""
-    
-    (campaignId, localDeliveryStatus)
   }
 
-  val jsonSer: NegotiatedSerializer[(String, LocalDeliveryStatus), ByteString] =
-    (message: (String, LocalDeliveryStatus)) => ByteString(message.toString().getBytes)
+  val jsonSer: NegotiatedSerializer[LocalDeliveryStatus, ByteString] =
+    (message: LocalDeliveryStatus) => ByteString(message.toString.getBytes)
 
-  val msgSer: MessageSerializer[(String, LocalDeliveryStatus), ByteString] =
-    new MessageSerializer[(String, LocalDeliveryStatus), ByteString] {
-      override def serializerForRequest
-      : NegotiatedSerializer[(String, LocalDeliveryStatus), ByteString] = jsonSer
+  val msgSer: MessageSerializer[LocalDeliveryStatus, ByteString] = new MessageSerializer[LocalDeliveryStatus, ByteString] {
+    override def serializerForRequest: NegotiatedSerializer[LocalDeliveryStatus, ByteString] = jsonSer
 
-      override def deserializer(protocol: MessageProtocol)
-      : NegotiatedDeserializer[(String, LocalDeliveryStatus), ByteString] = jsonDeser
+    override def deserializer(protocol: MessageProtocol): NegotiatedDeserializer[LocalDeliveryStatus, ByteString] = jsonDeser
 
-      override def serializerForResponse(acceptedMessageProtocols: immutable.Seq[MessageProtocol])
-      : NegotiatedSerializer[(String, LocalDeliveryStatus), ByteString] = jsonSer
-    }
+    override def serializerForResponse(acceptedMessageProtocols: immutable.Seq[MessageProtocol]): NegotiatedSerializer[LocalDeliveryStatus, ByteString] = jsonSer
+  }
 
 }
 
