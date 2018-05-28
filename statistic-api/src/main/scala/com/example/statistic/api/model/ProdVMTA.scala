@@ -1,5 +1,7 @@
 package com.example.statistic.api.model
 
+import play.api.libs.json.{Format, Json}
+
 case class ProdVMTA(
   ip: String,
   totalMailCount: Int,
@@ -14,3 +16,6 @@ case class ProdVMTA(
   domainId: String,
   domain: String
 )
+object ProdVMTA {
+  implicit val format: Format[ProdVMTA] = Json.format
+}

@@ -15,9 +15,7 @@ class CampaignStatisticEntitySpec extends WordSpec with Matchers with BeforeAndA
   private val system = ActorSystem("CampaignStatisticEntitySpec",
     JsonSerializerRegistry.actorSystemSetupFor(CampaignStatisticSerializerRegistry))
   
-  override protected def afterAll(): Unit = {
-    TestKit.shutdownActorSystem(system)
-  }
+  override protected def afterAll(): Unit = TestKit.shutdownActorSystem(system)
   
   private def entityId = "camp-1"
   
@@ -64,6 +62,7 @@ class CampaignStatisticEntitySpec extends WordSpec with Matchers with BeforeAndA
       val outcome = driver.run(GetCampaign(entityId))
       outcome.replies should contain only StateNotInit
     }
+    
   }
   
 }

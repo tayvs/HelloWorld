@@ -1,5 +1,6 @@
 package com.example.statistic.impl
 
+import com.example.statistic.api.model.{ProdVMTA, ProdVMTAStatistic, RedirectStatistic, StatisticProdDetails}
 import com.example.statistic.impl.CampaignStatisticCommand._
 import com.example.statistic.impl.CampaignStatisticEvent._
 import com.example.statistic.impl.CampaignStatisticState._
@@ -17,6 +18,10 @@ object CampaignStatisticSerializerRegistry extends JsonSerializerRegistry {
     JsonSerializer[Banned],
     JsonSerializer[Bounced],
     JsonSerializer[CampaignStart.type],
-    JsonSerializer[StatusChanged]
+    JsonSerializer[StatusChanged],
+    JsonSerializer[ProdVMTA],
+    JsonSerializer[ProdVMTAStatistic],
+    JsonSerializer[RedirectStatistic],
+    JsonSerializer[StatisticProdDetails]
   )
 }
