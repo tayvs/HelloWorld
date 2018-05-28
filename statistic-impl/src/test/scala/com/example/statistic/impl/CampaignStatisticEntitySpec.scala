@@ -6,6 +6,7 @@ import akka.testkit.TestKit
 import com.example.statistic.impl.CampaignStatisticCommand.{CampaignStart, GetCampaign}
 import com.example.statistic.impl.CampaignStatisticEvent.StatusChanged
 import com.example.statistic.impl.CampaignStatisticState.{CampaignStatistic, StateNotInit}
+import com.example.statistic.topic.JobId
 import com.lightbend.lagom.scaladsl.playjson.JsonSerializerRegistry
 import com.lightbend.lagom.scaladsl.testkit.PersistentEntityTestDriver
 import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpec}
@@ -18,6 +19,9 @@ class CampaignStatisticEntitySpec extends WordSpec with Matchers with BeforeAndA
   override protected def afterAll(): Unit = TestKit.shutdownActorSystem(system)
   
   private def entityId = "camp-1"
+  private def ip = "127.0.0.1"
+  private def domain = "localhost"
+  private def jobId = JobId(entityId, ip, domain)
   
   private def withTestDriver(block: PersistentEntityTestDriver[CampaignStatisticCommand[_], CampaignStatisticEvent,
     CampaignStatisticState] => Unit): Unit = {
@@ -29,8 +33,8 @@ class CampaignStatisticEntitySpec extends WordSpec with Matchers with BeforeAndA
   "CampaignStatistic entity" should {
     
     "statistic must be StateNotInit BUT commands must return Done and persist event" in withTestDriver { driver =>
-      val outcomes1 = driver.run(CampaignStatisticCommand.MailsStatus(1))
-      outcomes1.events should contain only CampaignStatisticEvent.Delivered()
+      val outcomes1 = driver.run(CampaignStatisticCommand.MailsStatus(jobId, 1))
+      outcomes1.events should contain only CampaignStatisticEvent.Delivered(jobId)
       outcomes1.replies should contain only Done
       
       val outcomes2 = driver.run(GetCampaign(entityId))
@@ -44,8 +48,8 @@ class CampaignStatisticEntitySpec extends WordSpec with Matchers with BeforeAndA
     }
     
     "statistic must be with entityId and one delivered mail" in withTestDriver { driver =>
-      val outcomes1 = driver.run(CampaignStatisticCommand.MailsStatus(1))
-      outcomes1.events should contain only CampaignStatisticEvent.Delivered()
+      val outcomes1 = driver.run(CampaignStatisticCommand.MailsStatus(jobId, 1))
+      outcomes1.events should contain only CampaignStatisticEvent.Delivered(jobId)
       outcomes1.replies should contain only Done
       
       val changeStatusCommand = CampaignStart
