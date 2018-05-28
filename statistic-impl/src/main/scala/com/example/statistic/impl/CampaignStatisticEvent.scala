@@ -1,5 +1,6 @@
 package com.example.statistic.impl
 
+import com.example.statistic.topic.JobId
 import com.lightbend.lagom.scaladsl.persistence.{AggregateEvent, AggregateEventTag}
 import play.api.libs.json.{Format, Json}
 
@@ -12,24 +13,25 @@ object CampaignStatisticEvent {
   
   sealed trait MailsEvent extends CampaignStatisticEvent {
     def count: Int
+    def jobId: JobId
   }
   
-  case class Delivered(count: Int = 1) extends MailsEvent
+  case class Delivered(jobId: JobId, count: Int = 1) extends MailsEvent
   object Delivered {
     implicit val format: Format[Delivered] = Json.format
   }
   
-  case class NotDelivered(count: Int = 1) extends MailsEvent
+  case class NotDelivered(jobId: JobId, count: Int = 1) extends MailsEvent
   object NotDelivered {
     implicit val format: Format[NotDelivered] = Json.format
   }
   
-  case class Banned(count: Int = 1) extends MailsEvent
+  case class Banned(jobId: JobId, count: Int = 1) extends MailsEvent
   object Banned {
     implicit val format: Format[Banned] = Json.format
   }
   
-  case class Bounced(count: Int = 1) extends MailsEvent
+  case class Bounced(jobId: JobId, count: Int = 1) extends MailsEvent
   object Bounced {
     implicit val format: Format[Bounced] = Json.format
   }
