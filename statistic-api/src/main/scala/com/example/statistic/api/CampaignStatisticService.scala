@@ -3,6 +3,7 @@ package com.example.statistic.api
 import akka.{Done, NotUsed}
 import com.example.statistic.api.model.StatisticProdDetails
 import com.example.statistic.topic.LocalDeliveryStatus
+import com.example.statistic.topic.LocalDeliveryStatus.DefinedMail
 import com.lightbend.lagom.scaladsl.api.{Descriptor, Service, ServiceCall}
 import play.api.libs.json.{Format, Json}
 
@@ -13,7 +14,9 @@ trait CampaignStatisticService extends Service {
   def startCampaign(campaignId: String): ServiceCall[NotUsed, StatisticProdDetails]
   
   def processStatistic: ServiceCall[LocalDeliveryStatus, Done]
-  
+
+  def bulkProcessStatistic: ServiceCall[List[DefinedMail], Done]
+
   override final def descriptor: Descriptor = {
     import Service._
     import com.lightbend.lagom.scaladsl.api.transport.Method
